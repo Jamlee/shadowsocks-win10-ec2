@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -7,6 +8,8 @@ using Microsoft.Win32;
 
 using Shadowsocks.Controller;
 using Shadowsocks.Controller.Hotkeys;
+using Shadowsocks.Controller.Service;
+using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.View;
 
@@ -17,12 +20,22 @@ namespace Shadowsocks
         public static ShadowsocksController MainController { get; private set; }
         public static MenuViewController MenuController { get; private set; }
 
+
+        public static void Init()
+        {
+            // 初始化配置并启动Aws自动侦测服务
+            var config = (new Shadowsocks.Util.AwsConfig()).config;
+            var aws = new AwsEc2(MainController, config.accessKey, config.accessSecret);
+            aws.Up();
+        }
+
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
         [STAThread]
         static void Main()
         {
+
             // Check OS since we are using dual-mode socket
             if (!Utils.IsWinVistaOrHigher())
             {
@@ -69,20 +82,29 @@ namespace Shadowsocks
                     return;
                 }
                 Directory.SetCurrentDirectory(Application.StartupPath);
-#if DEBUG
-                Logging.OpenLogFile();
+                #if DEBUG
+                    Logging.OpenLogFile();
 
-                // truncate privoxy log file while debugging
-                string privoxyLogFilename = Utils.GetTempPath("privoxy.log");
-                if (File.Exists(privoxyLogFilename))
-                    using (new FileStream(privoxyLogFilename, FileMode.Truncate)) { }
-#else
-                Logging.OpenLogFile();
-#endif
+                    // truncate privoxy log file while debugging
+                    string privoxyLogFilename = Utils.GetTempPath("privoxy.log");
+                    if (File.Exists(privoxyLogFilename))
+                        using (new FileStream(privoxyLogFilename, FileMode.Truncate)) { }
+                #else
+                    Logging.OpenLogFile();
+                #endif
+
                 MainController = new ShadowsocksController();
                 MenuController = new MenuViewController(MainController);
                 HotKeys.Init(MainController);
+
+                List<Server> reset = new List<Server>();
+                MainController.SaveServers(reset);
                 MainController.Start();
+
+                // 首次进行配置重载
+                Thread init = new Thread(Init);
+                init.Start();
+
                 Application.Run();
             }
         }
@@ -150,6 +172,11 @@ namespace Shadowsocks
 
         private static void Application_ApplicationExit(object sender, EventArgs e)
         {
+            // 关闭远端虚拟机
+            var config = (new Shadowsocks.Util.AwsConfig()).config;
+            var aws = new AwsEc2(MainController, config.accessKey, config.accessSecret);
+            aws.Down();
+
             // detach static event handlers
             Application.ApplicationExit -= Application_ApplicationExit;
             SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;

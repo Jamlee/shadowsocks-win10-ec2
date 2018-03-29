@@ -262,6 +262,7 @@ namespace Shadowsocks.View
         private void LoadMenu()
         {
             this.contextMenu1 = new ContextMenu(new MenuItem[] {
+                // this.enableAwsItem = CreateMenuItem("Enable Aws Server", new EventHandler(this.EnableItem_Click)),
                 this.enableItem = CreateMenuItem("Enable System Proxy", new EventHandler(this.EnableItem_Click)),
                 this.modeItem = CreateMenuGroup("Mode", new MenuItem[] {
                     this.PACModeItem = CreateMenuItem("PAC", new EventHandler(this.PACModeItem_Click)),
@@ -269,12 +270,7 @@ namespace Shadowsocks.View
                 }),
                 this.ServersItem = CreateMenuGroup("Servers", new MenuItem[] {
                     this.SeperatorItem = new MenuItem("-"),
-                    this.ConfigItem = CreateMenuItem("Edit Servers...", new EventHandler(this.Config_Click)),
-                    CreateMenuItem("Statistics Config...", StatisticsConfigItem_Click),
-                    new MenuItem("-"),
-                    CreateMenuItem("Share Server Config...", new EventHandler(this.QRCodeItem_Click)),
-                    CreateMenuItem("Scan QRCode from Screen...", new EventHandler(this.ScanQRCodeItem_Click)),
-                    CreateMenuItem("Import URL from Clipboard...", new EventHandler(this.ImportURLItem_Click))
+                    CreateMenuItem("Statistics Config...", StatisticsConfigItem_Click)
                 }),
                 CreateMenuGroup("PAC ", new MenuItem[] {
                     this.localPACItem = CreateMenuItem("Local PAC", new EventHandler(this.LocalPACItem_Click)),
@@ -463,13 +459,13 @@ namespace Shadowsocks.View
         {
             if (configForm != null)
             {
-                configForm.Activate();
+                // configForm.Activate();
             }
             else
             {
                 configForm = new ConfigForm(controller);
-                configForm.Show();
-                configForm.Activate();
+                // configForm.Show();
+                // configForm.Activate();
                 configForm.FormClosed += configForm_FormClosed;
             }
         }

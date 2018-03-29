@@ -3,14 +3,13 @@
 Shadowsocks=Shadowsocks
 
 # Menu items
-
 Enable System Proxy=启用系统代理
 Mode=系统代理模式
 PAC=PAC 模式
 Global=全局模式
 Servers=服务器
 Edit Servers...=编辑服务器...
-Statistics Config...=统计配置...
+Statistics Config...=流量统计配置...
 Start on Boot=开机启动
 Forward Proxy...=正向代理设置...
 Allow other Devices to connect=允许其他设备连入

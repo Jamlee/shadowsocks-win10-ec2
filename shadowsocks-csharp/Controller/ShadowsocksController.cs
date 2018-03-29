@@ -175,7 +175,7 @@ namespace Shadowsocks.Controller
             return plugin.LocalEndPoint;
         }
 
-        public void SaveServers(List<Server> servers, int localPort)
+        public void SaveServers(List<Server> servers, int localPort = 1080)
         {
             _config.configs = servers;
             _config.localPort = localPort;

@@ -68,11 +68,11 @@ namespace Shadowsocks.Model
         public Server()
         {
             server = "";
-            server_port = 8388;
-            method = "aes-256-cfb";
+            server_port = 19498;
+            method = "aes-256-gcm";
             plugin = "";
             plugin_opts = "";
-            password = "";
+            password = "superman";
             remarks = "";
             timeout = DefaultServerTimeoutSec;
         }
